@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Emergency Access Intelligence
+    </title>
+
+    <link rel="icon" href="data:,">
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <h1>
+            🚑 Emergency Access Intelligence
+        </h1>
+
+        <p>
+            Identify locations where emergency access
+            may be constrained.
+        </p>
+
+
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            System Active
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<main class="container">
+
+
+<!-- =====================================================
+     INTRODUCTION
+     ===================================================== -->
+
+<section class="intro-card">
+
+    <h2>
+        Emergency Access &amp; Safe Roads
+    </h2>
+
+
+    <p>
+        This platform analyzes junction risk,
+        hospital accessibility and nearby
+        high-risk locations to support
+        emergency-access planning.
+    </p>
+
+
+    <p class="warning-text">
+
+        ⚠️ This is a planning and decision-support
+        prototype. It does not provide live ambulance
+        navigation or real-time traffic data.
+
+    </p>
+
+</section>
+
+
+
+<!-- =====================================================
+     KPI CARDS
+     ===================================================== -->
+
+<section class="kpi-grid">
+
+
+    <div class="kpi-card critical">
+
+        <span>
+            Critical
+        </span>
+
+        <strong id="criticalCount">
+            0
+        </strong>
+
+    </div>
+
+
+
+    <div class="kpi-card high">
+
+        <span>
+            High
+        </span>
+
+        <strong id="highCount">
+            0
+        </strong>
+
+    </div>
+
+
+
+    <div class="kpi-card medium">
+
+        <span>
+            Medium
+        </span>
+
+        <strong id="mediumCount">
+            0
+        </strong>
+
+    </div>
+
+
+
+    <div class="kpi-card low">
+
+        <span>
+            Low
+        </span>
+
+        <strong id="lowCount">
+            0
+        </strong>
+
+    </div>
+
+
+
+    <div class="kpi-card corridor">
+
+        <span>
+            Risk Corridors
+        </span>
+
+        <strong id="corridorCount">
+            0
+        </strong>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     SEARCH + FILTER
+     ===================================================== -->
+
+<section class="controls">
+
+
+    <!-- SEARCH -->
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Enter area name..."
+            autocomplete="off"
+        >
+
+
+        <button
+            id="searchButton"
+            class="search-button"
+            type="button"
+        >
+
+            🔍 Search
+
+        </button>
+
+    </div>
+
+
+
+    <!-- RISK FILTER -->
+    <select
+        id="riskFilter"
+        aria-label="Filter by risk"
+    >
+
+        <option value="ALL">
+            All
+        </option>
+
+        <option value="CRITICAL">
+            Critical
+        </option>
+
+        <option value="HIGH">
+            High
+        </option>
+
+        <option value="MEDIUM">
+            Medium
+        </option>
+
+        <option value="LOW">
+            Low
+        </option>
+
+    </select>
+
+
+
+    <!-- RESET -->
+    <button
+        id="resetButton"
+        class="reset-button"
+        type="button"
+    >
+
+        Reset
+
+    </button>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     SEARCH HELP
+     ===================================================== -->
+
+<div class="search-help">
+
+    <span>
+        💡
+    </span>
+
+    <span>
+        Enter an area name and press
+        <strong>Search</strong>
+        to zoom the map to matching
+        emergency-risk junctions.
+    </span>
+
+</div>
+
+
+
+<!-- =====================================================
+     MAP
+     ===================================================== -->
+
+<section class="section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                Emergency Risk Map
+            </h2>
+
+            <p>
+                High-risk junctions and
+                emergency-access locations
+            </p>
+
+        </div>
+
+
+        <div class="map-legend">
+
+            <span>
+                <i class="legend-dot critical-dot"></i>
+                Critical
+            </span>
+
+            <span>
+                <i class="legend-dot high-dot"></i>
+                High
+            </span>
+
+            <span>
+                <i class="legend-dot medium-dot"></i>
+                Medium
+            </span>
+
+            <span>
+                <i class="legend-dot low-dot"></i>
+                Low
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="map"
+        class="map-container"
+    ></div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     SELECTED LOCATION
+     ===================================================== -->
+
+<section class="selected-location">
+
+
+    <div id="selectedLocation">
+
+        <div class="selected-header">
+
+            <div>
+
+                <span class="small-label">
+                    SELECTED LOCATION
+                </span>
+
+                <h2>
+                    Select a marker
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <p>
+            Search for an area or select a marker
+            on the map to view details.
+        </p>
+
+    </div>
+
+
+
+    <!-- WHY RISKY -->
+
+    <div id="riskExplanation">
+
+        <h3>
+            Why Is It Risky?
+        </h3>
+
+        <p>
+            Select a junction to see the
+            risk explanation.
+        </p>
+
+    </div>
+
+
+
+    <!-- ACTION -->
+
+    <div id="recommendedAction">
+
+        <h3>
+            Recommended Action
+        </h3>
+
+        <p>
+            Select a junction to see the
+            recommended action.
+        </p>
+
+    </div>
+
+
+
+    <!-- CONFIDENCE -->
+
+    <div id="dataConfidence">
+
+        <strong>
+            Data Confidence:
+        </strong>
+
+        Select a location to view
+        confidence information.
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     RISK CALCULATION
+     ===================================================== -->
+
+<section class="section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                🧠 How Emergency Risk Is Calculated
+            </h2>
+
+            <p>
+                Explainable processing pipeline used
+                to prioritize emergency-access locations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="pipeline">
+
+
+        <!-- STEP 1 -->
+
+        <div class="pipeline-step">
+
+            <div class="pipeline-icon">
+                🗺️
+            </div>
+
+            <strong>
+                Road Network
+            </strong>
+
+            <span>
+                OpenStreetMap road data
+            </span>
+
+        </div>
+
+
+
+        <div class="pipeline-arrow">
+            ↓
+        </div>
+
+
+
+        <!-- STEP 2 -->
+
+        <div class="pipeline-step">
+
+            <div class="pipeline-icon">
+                🛣️
+            </div>
+
+            <strong>
+                Junction Analysis
+            </strong>
+
+            <span>
+                Junction characteristics
+            </span>
+
+        </div>
+
+
+
+        <div class="pipeline-arrow">
+            ↓
+        </div>
+
+
+
+        <!-- STEP 3 -->
+
+        <div class="pipeline-step">
+
+            <div class="pipeline-icon">
+                📊
+            </div>
+
+            <strong>
+                Junction Priority
+            </strong>
+
+            <span>
+                Priority score
+            </span>
+
+        </div>
+
+
+
+        <div class="pipeline-arrow">
+            ↓
+        </div>
+
+
+
+        <!-- STEP 4 -->
+
+        <div class="pipeline-step">
+
+            <div class="pipeline-icon">
+                🏥
+            </div>
+
+            <strong>
+                Hospital Accessibility
+            </strong>
+
+            <span>
+                Nearest hospital distance
+                and hospitals within 5 km
+            </span>
+
+        </div>
+
+
+
+        <div class="pipeline-arrow">
+            ↓
+        </div>
+
+
+
+        <!-- STEP 5 -->
+
+        <div class="pipeline-step final-step">
+
+            <div class="pipeline-icon">
+                🚨
+            </div>
+
+            <strong>
+                Emergency Access Risk
+            </strong>
+
+            <span>
+                Normalized score from 0 to 1
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- SCORE EXPLANATION -->
+
+    <div class="score-explanation">
+
+        <h3>
+            What the score means
+        </h3>
+
+        <p>
+            The system combines junction priority
+            and hospital accessibility indicators
+            to produce an emergency-access risk score.
+        </p>
+
+        <p>
+            Higher scores indicate locations that
+            should receive greater attention during
+            emergency-access planning.
+        </p>
+
+        <p class="small-note">
+
+            The model is a decision-support prototype
+            and should be validated using real traffic,
+            emergency-response and incident data before
+            operational deployment.
+
+        </p>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     CORRIDORS
+     ===================================================== -->
+
+<section class="section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                🚨 High-Risk Corridor Candidates
+            </h2>
+
+            <p>
+                Nearby Critical/High junctions grouped
+                for corridor-level investigation.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="corridorList"
+        class="corridor-list"
+    >
+
+        <p class="empty-message">
+            Loading corridor analysis...
+        </p>
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================================
+     ANALYTICS AND SCENARIO PLANNING
+     ===================================================== -->
+
+<section class="section">
+
+    <div class="section-header">
+        <div>
+            <h2>Analytics &amp; Scenario Planning</h2>
+            <p>Explore the current dataset and test a transparent, hypothetical model scenario.</p>
+        </div>
+        <button id="reportButton" class="search-button" type="button">
+            Download planning report
+        </button>
+    </div>
+
+    <div id="analyticsStatus" class="small-note" role="status">
+        Loading analytics...
+    </div>
+    <div id="analyticsSummary" class="analytics-summary"></div>
+    <div id="distanceBands" class="distance-bands"></div>
+
+    <div class="scenario-panel">
+        <h3>Intervention simulation</h3>
+        <p class="card-description">
+            Select a junction on the map or in the table, choose one model component,
+            and apply a hypothetical reduction. This changes the model score only;
+            it does not predict travel-time or real-world outcome improvements.
+        </p>
+        <div class="scenario-controls">
+            <label for="scenarioComponent">Model component</label>
+            <select id="scenarioComponent">
+                <option value="hospital_access_risk">Hospital access risk (40% weight)</option>
+                <option value="priority_score">Junction priority (60% weight)</option>
+            </select>
+            <label for="scenarioReduction">Hypothetical component reduction</label>
+            <input id="scenarioReduction" type="range" min="0" max="100" value="25">
+            <output id="scenarioReductionValue" for="scenarioReduction">25%</output>
+            <button id="simulateButton" class="search-button" type="button" disabled>
+                Run scenario
+            </button>
+        </div>
+        <div id="simulationResult" class="simulation-result" role="status">
+            Select a junction to run a scenario.
+        </div>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HOTSPOT TABLE
+     ===================================================== -->
+
+<section class="section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                Places to Check First
+            </h2>
+
+            <p>
+                Highest-priority emergency-access
+                locations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Rank
+                    </th>
+
+                    <th>
+                        Area
+                    </th>
+
+                    <th>
+                        Risk
+                    </th>
+
+                    <th>
+                        Hospital Access Risk
+                    </th>
+
+                    <th>
+                        Nearest Hospital
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody id="hotspotTableBody">
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="empty-message"
+                    >
+
+                        Loading...
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     EXPLANATION CARDS
+     ===================================================== -->
+
+<section class="explanation-grid">
+
+
+    <!-- EXPLAINABLE RISK -->
+
+    <div class="info-card">
+
+        <div class="info-icon">
+            🧠
+        </div>
+
+        <h3>
+            Explainable Risk
+        </h3>
+
+        <p>
+            Each hotspot is accompanied by factors
+            such as junction priority and hospital
+            accessibility rather than only displaying
+            a numerical score.
+        </p>
+
+    </div>
+
+
+
+    <!-- HOSPITAL -->
+
+    <div class="info-card">
+
+        <div class="info-icon">
+            🏥
+        </div>
+
+        <h3>
+            Hospital Accessibility
+        </h3>
+
+        <p>
+            The system considers the distance to
+            the nearest hospital and the number of
+            hospitals within 5 km.
+        </p>
+
+    </div>
+
+
+
+    <!-- CORRIDOR -->
+
+    <div class="info-card">
+
+        <div class="info-icon">
+            🛣️
+        </div>
+
+        <h3>
+            Corridor Intelligence
+        </h3>
+
+        <p>
+            Nearby high-risk junctions are grouped
+            into corridor candidates for further
+            emergency-access investigation.
+        </p>
+
+    </div>
+
+
+
+    <!-- DECISION SUPPORT -->
+
+    <div class="info-card">
+
+        <div class="info-icon">
+            📊
+        </div>
+
+        <h3>
+            Decision Support
+        </h3>
+
+        <p>
+            Recommendations help identify locations
+            that may need further traffic-flow or
+            healthcare accessibility assessment.
+        </p>
+
+    </div>
+
+
+</section>
+
+
+</main>
+
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<footer class="footer">
+
+    Emergency Access Intelligence
+    <span>|</span>
+    Data-driven emergency planning prototype
+
+</footer>
+
+
+
+<!-- =====================================================
+     LEAFLET JS
+     ===================================================== -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+
+<!-- =====================================================
+     APPLICATION JS
+     ===================================================== -->
+
+<script src="app.js"></script>
+
+
+</body>
+
+</html>

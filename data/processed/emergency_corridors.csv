@@ -1,0 +1,2 @@
+corridor_id,junction_count,critical_count,high_count,mean_risk,junction_ids,areas,corridor_priority,interpretation
+1,26,9,17,0.6941,"24999,25001,76385,72019,76144,20195,3151,974,1481,68900,76113,72002,71995,71986,72010,72011,72050,71987,47624,931,47595,36255,43537,13901,71988,71989",Osman Nagar | Aman Nagar Colony | Tad Bun | Aghapura | Lenin Nagar,0.9082,Cluster of high-risk junctions requiring corridor-level emergency-access investigation.

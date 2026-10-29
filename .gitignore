@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+.env
+.env.*
+!.env.example
+
+# Large raw and derived geospatial files are not needed to run the dashboard.
+data/raw/
+data/processed/*.graphml
+data/processed/*.gpkg
+data/processed/*_map.html
+data/processed/candidate_intersections.csv
+data/processed/emergency_hotspots.geojson
+data/processed/genuine_junctions.csv
+data/processed/junction_clusters.csv
+data/processed/junction_features.csv

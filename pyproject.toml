@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "emergency-access-intelligence"
+version = "1.0.0"
+description = "Geospatial decision support for emergency-access planning."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "pandas>=2.2,<4",
+    "uvicorn[standard]>=0.30,<1",
+]
+
+[project.optional-dependencies]
+pipeline = [
+    "folium>=0.17,<1",
+    "geopandas>=1.0,<2",
+    "networkx>=3.3,<4",
+    "numpy>=2.0,<3",
+    "osmium>=4,<5",
+    "osmnx>=2.0,<3",
+    "pyogrio>=0.9,<1",
+    "pyproj>=3.7,<4",
+    "scikit-learn>=1.5,<2",
+    "scipy>=1.14,<2",
+    "shapely>=2.0,<3",
+]
+test = [
+    "pytest>=8,<9",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
